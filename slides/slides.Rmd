@@ -4,6 +4,7 @@ author: "Christophe Dervieux"
 date: userR!2022 - 22nd July
 output:
   xaringan::moon_reader:
+    keep_md: true
     lib_dir: libs
     chakra: libs/remark-latest.min.js
     css: [useR, useR-fonts, custom.sass]
@@ -116,34 +117,40 @@ The engine defines **how** the `<code content>` will be processed **using `optio
 
 ---
 
-# Include content verbatim (1)
+# There is more than just R !
 
-.subtitle[About `verbatim` engine]
+.subtitle[Meet the other engines !]
 
-.panelset[
+The {knitr} engines are the _'secret sauce'_ of the knitting process and you can use any kind of engine to mix literate and code source / results.
 
-.panel[.panel-name[in your Rmd]
-`````{verbatim, lang = "markdown"}
+- Include other content like `embed` engine,
+- Run another language like `python` engine,
+- Query some data with `sql` engine,
+- and much more... (`r emo::ji("shushing")` _custom engine_)
 
-Let's show an example of Rmd file content: 
+.center[Let's take a tour! `r emo::ji("bus")`]
 
-*````{verbatim, lang = "markdown"}
-We can output arbitrary content **verbatim**.
+---
+layout: true
+# Meet the `verbatim` engine
 
-```{r}
-1 + 1
+.subtitle[Including R Markdown content asis]
+
+---
+
+```{r, echo = FALSE}
+verbatim_content <- xfun::read_utf8("examples/verbatim-engine.Rmd")
+verbatim_content <- gsub("(`{4}\\{)", "*\\1", verbatim_content)
 ```
 
-The content can contain inline code like
-`r pi * 5^2`, too.
-*````
+In your source document:
+
+`````{verbatim, lang = "markdown", code = verbatim_content}
 `````
 
-]
+---
 
-.panel[.panel-name[after knit in md file]
-
-
+After knitting:
 
 `````{verbatim, lang = "markdown"}
 Let's show an example of Rmd file content: 
@@ -157,35 +164,29 @@ We can output arbitrary content **verbatim**.
 
 The content can contain inline code like
 `r pi * 5^2`, too.
-*````
+````
 `````
 
-]
+---
+layout: true
+# And the related `embed` engine
 
-]
-
-See also about `knitr::inline_expr()` to [Show a verbatim inline expression](https://bookdown.org/yihui/rmarkdown-cookbook/verbatim-code-chunks.html#show-a-verbatim-inline-expression)
+.subtitle[Include content of an external file]
 
 ---
-
-# Include content verbatim (2)
-
-.subtitle[About `embed` engine]
-
-.panelset[
-
-.panel[.panel-name[`macros.js`]
 
 Here is the `macros.js` content used for _remark.js_ with this **xaringan** presentation
 
 ```{embed, file = "macros.js"}
 ```
 
-]
+???
 
-.panel[.panel-name[inside Rmd file]
+Where is the `embed` engine
 
+---
 
+This is the markdown source before knitting:
 
 `````{verbatim, lang = "markdown"}
 Here is the `macros.js` content used for _remark.js_ with this **xaringan** presentation
@@ -194,11 +195,13 @@ Here is the `macros.js` content used for _remark.js_ with this **xaringan** pres
 ```
 `````
 
-]
+???
 
-.panel[.panel-name[after knit in md file]
+Let's have a look at a JS file I am using in this presentation
 
+---
 
+And the result after knitting in the source:
 
 ````markdown
 Here is the `macros.js` content used for _remark.js_ with this **xaringan** presentation
@@ -208,23 +211,19 @@ Here is the `macros.js` content used for _remark.js_ with this **xaringan** pres
 ```
 ````
 
-]
-
-]
+???
 
 * Language used for code blocks is derived from file extension
 * It can be customized using the `lang` option
 * Equivalent to using `verbatim` engine with `lang` and `code` chunk options... but simpler to use !
 
-???
-
 https://bookdown.org/yihui/rmarkdown-cookbook/verbatim-code-chunks.html#verbatim-code-chunks
 
 ---
 layout: true
-# About `asis engine`
+# About `asis` engine
 
-.subtitle[Inserting raw content conditionnaly]
+.subtitle[Inserting raw content conditionnally]
 
 ---
 
@@ -266,6 +265,7 @@ https://bookdown.org/yihui/rmarkdown-cookbook/eng-asis.html
 
 ---
 
+layout: false
 # Using any command-line tools in a chunk (1)
 
 .subtitle[About the `exec` engine]
@@ -370,6 +370,34 @@ unlink("marks.txt")
 ???
 
 Using some command line tools may require tweaking the `exec` engine arguments
+
+---
+
+# Be multilingual !
+
+.subtile[with other langue engines]
+
+* `python`  with {reticulate} `r emo::ji("package")`
+* `sql` to query using `DBI` `r emo::ji("package")`
+* `bash` to run Bash command in your shell
+
+And more 
+
+---
+
+# Go futher with engines for external tools
+
+.subtitle[A glimpse of extensibility]
+ 
+* `tikz` to run LaTeX tikz tools
+* `texPreview` to include results of LaTeX in other type of outputs
+* `targets` engine to use literate programming to create a target workflow
+
+???
+
+https://yonicd.github.io/texPreview/
+
+https://books.ropensci.org/targets/markdown.html
 
 ---
 
