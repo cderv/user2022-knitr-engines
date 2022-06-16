@@ -1,0 +1,445 @@
+---
+title: "A tour of {knitr} engines:</br>{knitr} not only knits R"
+author: "Christophe Dervieux"
+date: userR!2022 - 22nd July
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    chakra: libs/remark-latest.min.js
+    css: [useR, useR-fonts, custom.sass]
+    nature:
+      ratio: '16:9'
+      # scale and scaleh
+      beforeInit: "macros.js"
+      highlightLines: true
+      # highlightStyle: solarized-light
+---
+
+```{r xaringan-tachyons, echo=FALSE}
+xaringanExtra::use_tachyons()
+xaringanExtra::use_tile_view()
+xaringanExtra::use_panelset()
+xaringanExtra::use_freezeframe(responsive = FALSE)
+
+# will be used several times in a cat engine
+temp_file <- tempfile(fileext = ".Rmd")
+# setting option for the several cat engine
+knitr::opts_template$set(cat_md = list(
+  engine.opts = list(file = temp_file, lang = "markdown"),
+  echo = TRUE
+))
+# clean tempfile after a chunk computation
+knitr::knit_hooks$set(rm_temp = function(before) {
+  if (!before) unlink(temp_file)
+})
+```
+
+# About me
+
+.center[
+
+.profile[![:scale 25%, profile picture for @cderv in Github](https://avatars.githubusercontent.com/u/6791940?v=4)]
+
+RStudio &#8226; Software Engineer &#8226; R Markdown Team
+
+]
+.pull-left[
+.center[
+`r fontawesome::fa("github")`
+[@cderv](https://github.com/cderv)
+]
+]
+
+.pull-right[
+.center[
+`r fontawesome::fa("twitter")`
+[@chrisderv](https://twitter.com/chrisderv)
+]
+]
+
+???
+
+---
+# About this talk 
+
+.pull-left.center[
+![:scale 75%, knitr package logo](https://github.com/rstudio/hex-stickers/raw/master/SVG/knitr.svg)
+]
+.pull-right.center[
+![:scale 100%, R Markdown Cookbook book cover](https://github.com/allisonhorst/stats-illustrations/raw/master/rstats-artwork/rmarkdown_rockstar.png)
+.f6[Illustration by [Alison Horst](https://github.com/allisonhorst/stats-illustrations))]
+]
+
+???
+
+---
+layout: true
+
+# What happens when it renders ?
+
+---
+
+.center.f3[`knitr::knit()` + Pandoc (+ LaTeX for PDF) = `rmarkdown::render()`]
+
+.center[
+![:scale 80%, Diagram showing the different step of rendering, using knitr first from Rmd to md, then Pandoc from md to output format like HTML, DOC and PDF (using LaTeX)](https://bookdown.org/yihui/rmarkdown-cookbook/images/workflow.png)
+]
+.source-fig.center[
+source: [R Markdown Cookbook](https://bookdown.org/yihui/rmarkdown-cookbook)
+]
+
+---
+
+.center.f3[.ba.b--blue.br4.bw2.pa2[`knitr::knit()`] + Pandoc (+ LaTeX for PDF) = `rmarkdown::render()`]
+
+.center[
+![:scale 80%, Diagram showing the different step of rendering, using knitr first from Rmd to md, then Pandoc from md to output format like HTML, DOC and PDF (using LaTeX)](https://bookdown.org/yihui/rmarkdown-cookbook/images/workflow.png)
+]
+.source-fig.center[
+source: [R Markdown Cookbook](https://bookdown.org/yihui/rmarkdown-cookbook)
+]
+
+---
+layout: false
+
+# What is a {knitr} engine ? 
+
+{knitr} is primarly made for R code, and a chunk looks like this
+
+````{verbatim, lang = "markdown"}
+*```{<engine> label, options}
+<code content>
+```
+````
+
+The engine defines **how** the `<code content>` will be processed **using `options`** provided on the chunk, and globally, **as configuration**.
+
+---
+
+# Include content verbatim (1)
+
+.subtitle[About `verbatim` engine]
+
+.panelset[
+
+.panel[.panel-name[in your Rmd]
+`````{verbatim, lang = "markdown"}
+
+Let's show an example of Rmd file content: 
+
+*````{verbatim, lang = "markdown"}
+We can output arbitrary content **verbatim**.
+
+```{r}
+1 + 1
+```
+
+The content can contain inline code like
+`r pi * 5^2`, too.
+*````
+`````
+
+]
+
+.panel[.panel-name[after knit in md file]
+
+
+
+`````{verbatim, lang = "markdown"}
+Let's show an example of Rmd file content: 
+
+*````markdown
+We can output arbitrary content **verbatim**.
+
+```{r}
+1 + 1
+```
+
+The content can contain inline code like
+`r pi * 5^2`, too.
+*````
+`````
+
+]
+
+]
+
+See also about `knitr::inline_expr()` to [Show a verbatim inline expression](https://bookdown.org/yihui/rmarkdown-cookbook/verbatim-code-chunks.html#show-a-verbatim-inline-expression)
+
+---
+
+# Include content verbatim (2)
+
+.subtitle[About `embed` engine]
+
+.panelset[
+
+.panel[.panel-name[`macros.js`]
+
+Here is the `macros.js` content used for _remark.js_ with this **xaringan** presentation
+
+```{embed, file = "macros.js"}
+```
+
+]
+
+.panel[.panel-name[inside Rmd file]
+
+
+
+`````{verbatim, lang = "markdown"}
+Here is the `macros.js` content used for _remark.js_ with this **xaringan** presentation
+
+*```{embed, file = "macros.js"}
+```
+`````
+
+]
+
+.panel[.panel-name[after knit in md file]
+
+
+
+````markdown
+Here is the `macros.js` content used for _remark.js_ with this **xaringan** presentation
+
+*```js
+`r xfun::file_string("macros.js")`
+```
+````
+
+]
+
+]
+
+* Language used for code blocks is derived from file extension
+* It can be customized using the `lang` option
+* Equivalent to using `verbatim` engine with `lang` and `code` chunk options... but simpler to use !
+
+???
+
+https://bookdown.org/yihui/rmarkdown-cookbook/verbatim-code-chunks.html#verbatim-code-chunks
+
+---
+layout: true
+# About `asis engine`
+
+.subtitle[Inserting raw content conditionnaly]
+
+---
+
+```{r, echo = FALSE}
+asis_content <- knitr::knit_expand("examples/asis-engine.Rmd", value = "getRandomNumber() == 4")
+asis_content <- gsub("\\n(```\\{asis)", "*\\1", asis_content)
+```
+
+
+.fl.w-60.pa2[
+```{verbatim, code = asis_content}
+```
+]
+
+.fl.w-40.pa2[
+![](https://imgs.xkcd.com/comics/random_number.png)
+.source-fig.right[https://xkcd.com/221/]
+]
+
+---
+
+.fl.w-50.pa2[
+.f3[For `getRandomNumber() != 4`]
+
+```{verbatim, code = knitr::knit_child(text = knitr::knit_expand("examples/asis-engine.Rmd", value = "FALSE"))}
+```
+]
+
+.fl.w-50.pa2[
+.f3[For `getRandomNumber() == 4`]
+
+```{verbatim, code = knitr::knit_child(text = knitr::knit_expand("examples/asis-engine.Rmd", value = "TRUE"))}
+```
+]
+
+???
+
+https://bookdown.org/yihui/rmarkdown-cookbook/eng-asis.html
+
+---
+
+# Using any command-line tools in a chunk (1)
+
+.subtitle[About the `exec` engine]
+
+The `exec` engine allows to execute an arbitrary command on the code chunk
+content, optionally with arguments.
+
+</br>
+
+.panelset.sideways[
+
+.panel[.panel-name[In your Rmd file]
+
+
+````{verbatim exec-rscript,  lang = "markdown"}
+```{exec, command='Rscript', engine.opts = list(args1 = "--vanilla")}
+1 + 1
+```
+````
+
+]
+
+.panel[.panel-name[after knit in md file]
+````markdown
+```{r, results = "asis", echo = FALSE}
+cat(knitr::knit_child(text = knitr::knit_code$get("exec-rscript"), options = list(message = FALSE), quiet = TRUE), sep = "\n")
+```
+````
+
+]
+
+]
+
+For details about this new engine, see [`124-exec-engine.Rmd`](https://github.com/yihui/knitr-examples/blob/master/124-exec-engine.Rmd) in [knitr-examples repo](https://github.com/yihui/knitr-examples).
+
+???
+
+The `exec` engine allows to execute an arbitrary command on the code chunk
+content, optionally with arguments. If any, they are passed to `engine.opts` and
+they could be one of the following:
+
+---
+
+# Using any command-line tools in a chunk (2)
+
+.subtitle[More complexe example using `awk`]
+
+.panelset[
+
+.panel[.panel-name[`marks.txt`]
+
+```{cat, engine.opts = list(file = "marks.txt")}
+1) Amit Physics 80
+2) Rahul Maths 90
+3) Shyam Biology 87
+4) Kedar Maths 85
+5) Hari History 89
+```
+
+```{embed}
+marks.txt
+```
+
+Let's try process this file with `awk` from within our R Markdown document
+
+]
+
+.panel[.panel-name[in Rmd file]
+
+````{verbatim exec-awk,  lang = "markdown"}
+Let's count how many line contains `Maths`
+
+```{exec, command = "awk", engine.opts = list(args1 = "-f", args2 = "marks.txt")}
+/Maths/{++cnt} END {print "Count = ", cnt}
+```
+````
+
+* `args1 = "-f"` needed to execute the content of the chunk as a `awk` program
+* `args2` is used to pass the text file to process with the program
+
+]
+
+.panel[.panel-name[after knit in md file]
+
+````markdown
+```{r, results = "asis", echo = FALSE, eval = nzchar(Sys.which("awk"))}
+cat(knitr::knit_child(text = knitr::knit_code$get("exec-awk"), options = list(message = FALSE), quiet = TRUE), sep = "\n")
+```
+````
+
+See [`124-exec-engine.Rmd`](https://github.com/yihui/knitr-examples/blob/master/124-exec-engine.Rmd) in [knitr-examples repo](https://github.com/yihui/knitr-examples) for the different options.
+
+]
+
+]
+
+```{r, include = FALSE}
+unlink("marks.txt")
+```
+
+
+???
+
+Using some command line tools may require tweaking the `exec` engine arguments
+
+---
+
+# Registering custom engine
+
+.subtitle[Extending {knitr}]
+
+???
+
+https://bookdown.org/yihui/rmarkdown-cookbook/custom-engine.html
+
+---
+
+# How to go further ?
+
+.subtitle[and enhanced even more your Rmd !]
+
+.pull-left[
+.center[
+![:scale 50%, R Markdown Cookbook online book cover](https://bookdown.org/yihui/rmarkdown-cookbook/images/cover.png)
+]
+]
+
+.pull-right[
+
+More in the book !
+
+.small[https://bookdown.org/yihui/rmarkdown-cookbook/]
+]
+
+---
+class: center, middle, annexe
+count: false
+
+# Thank you !
+.f3[https://cderv.rbind.io/slides/user2021-enhanced-rmd]
+
+.f3.color1[`r fontawesome::fa("github")`]</br>.f3[https://github.com/cderv/user2021-extend-Rmd]
+
+---
+class: annexe
+count: false
+
+# Acknowledgement
+
+```{r, include = FALSE}
+gh_handle_to_link <- function(handle) sprintf("[@%s](https://github.com/%s)", handle, handle)
+```
+
+
+* Emily Riederer and Yihui Xie, for the R Markdown Cookbook
+* Allison Horst for the illustrations.
+* Alison Presman-Hill and Allison Horst for the **palmerpinguins** `r emo::ji("package")` and vignettes.
+* `r gh_handle_to_link("cpsievert")` for the [**sass**](https://rstudio.github.io/sass/) `r emo::ji("package")`
+
+```{r meta, echo=FALSE}
+library(metathis)
+meta() %>%
+  meta_general(
+    description = "A presentation at useR2021 about tips and tricks to enhanced a R Markdown document output.",
+    generator = "xaringan and remark.js"
+  ) %>% 
+  meta_social(
+    title = "Extend the functionality of your R Markdown document.",
+    url = "https://user2021-enhanced-rmd.netlify.app/",
+    image = "https://user2021-enhanced-rmd.netlify.app//whwir.png",
+    image_alt = "The fourth slide of the presentation showing an illustration by Allison Horst about the little wizard implied in the process of cooking a Rmd document from Text & Code to produce a beautiful output.",
+    og_type = "website",
+    og_author = "Christophde Dervieux",
+    twitter_card_type = "summary_large_image",
+    twitter_creator = "@chrisderv"
+  )
+```

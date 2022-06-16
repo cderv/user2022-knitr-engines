@@ -1,0 +1,112 @@
+$color1: #0A7FB2 // blue
+
+.color1
+  color: $color1
+
+/* rounded image */
+
+.profile img
+  border-radius: 50%
+
+.small
+  font-size: 60%
+
+.smaller
+  font-size: 40%
+
+.big
+  font-size: 150%
+
+%top-margin-m30
+  margin-top: -30px
+
+.remark-slide-content
+  .subtitle
+    display: block
+    color: #777
+    font-size: 35px
+    margin-bottom: 20px
+    @extend %top-margin-m30
+
+.right
+  display: block
+  text-align: right
+
+.source-fig
+  @extend .smaller
+  p
+    margin-top: -30px
+
+/* box */
+
+.box
+  display: block
+  text-align: center
+  position: relative
+  border: 2px solid $color1
+  padding: 10px
+  margin: 10px
+
+  p
+    margin: 0px
+
+.inline-box
+  text-align: center
+  position: relative
+  border: 2px solid $color1
+  padding: 10px
+  margin: 10px
+
+.panelset
+  --panel-tab-active-border-color: #{$color1}
+  --panel-tab-hover-border-color: #{$color1}
+
+.panelset
+  pre
+    margin-top: 0px
+
+    font-size: 20pt
+
+/* wrap content in code chunk */
+pre
+  code
+    white-space: pre-wrap
+
+/* pull */
+
+%pull
+  width: 47%
+  margin-top: 0px
+
+.pull-left
+    @extend %pull
+    float: left
+
+.pull-right
+    @extend %pull
+    float: right
+
+.annexe
+  .remark-slide-number
+    display: none
+
+/* useR fonts fix - override the ones provided in CSS*/
+body
+  .remark-slide-content
+    font-family: 'Droid Sans', 'Book Antiqua', Palatino, 'Microsoft YaHei', 'Songti SC', serif
+    font-size: 28pt
+    h1
+      font-family: 'Open Sans'
+      font-size: 36pt
+    h2
+      font-family: 'Open Sans'
+      font-size: 34pt
+    h3
+      font-family: 'Open Sans'
+      font-size: 32pt
+
+    .remark-code, .remark-inline-code
+      font-family: 'Source Code Pro', 'Lucida Console', Monaco, monospace
+
+
+

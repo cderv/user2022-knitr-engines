@@ -1,0 +1,11 @@
+# files already in root, moved by makefile for deployment
+simple-report*.Rmd
+simple-report*.html
+
+# built file
+*_files/
+*.html
+
+# downloaded resources
+libs/
+
