@@ -105,15 +105,18 @@ layout: false
 
 # What is a {knitr} engine ? 
 
-{knitr} is primarly made for R code, and a chunk looks like this
 
 ````{verbatim, lang = "markdown"}
-*```{<engine> label, options}
+```{<engine> label, okey = oval}
 <code content>
 ```
 ````
 
-The engine defines **how** the `<code content>` will be processed **using `options`** provided on the chunk, and globally, **as configuration**.
+The engine defines **how** the `<code content>` will be processed **using `options` as configuration**, provided either on the chunk as `key = values`, or globally using `knitr::opts_chunks$set()`.
+
+???
+
+Alternative syntax : https://yihui.org/en/2022/01/knitr-news/
 
 ---
 
@@ -134,7 +137,7 @@ The {knitr} engines are the _'secret sauce'_ of the knitting process and you can
 layout: true
 # Meet the `verbatim` engine
 
-.subtitle[Including R Markdown content asis]
+.subtitle[Include R Markdown content asis]
 
 ---
 
@@ -221,9 +224,9 @@ https://bookdown.org/yihui/rmarkdown-cookbook/verbatim-code-chunks.html#verbatim
 
 ---
 layout: true
-# About `asis` engine
+# Look at the `asis` engine
 
-.subtitle[Inserting raw content conditionnally]
+.subtitle[Insert raw content conditionnally]
 
 ---
 
@@ -264,20 +267,18 @@ asis_content <- gsub("\\n(```\\{asis)", "*\\1", asis_content)
 https://bookdown.org/yihui/rmarkdown-cookbook/eng-asis.html
 
 ---
+layout: true
 
-layout: false
-# Using any command-line tools in a chunk (1)
+# New `exec` engine 
 
-.subtitle[About the `exec` engine]
+.subtitle[Use any command-line tools on the chunk content]
+
+---
 
 The `exec` engine allows to execute an arbitrary command on the code chunk
 content, optionally with arguments.
 
-</br>
-
-.panelset.sideways[
-
-.panel[.panel-name[In your Rmd file]
+In your Rmd file
 
 
 ````{verbatim exec-rscript,  lang = "markdown"}
@@ -285,23 +286,17 @@ content, optionally with arguments.
 1 + 1
 ```
 ````
+---
 
-]
-
-.panel[.panel-name[after knit in md file]
+After knitting in md file
 ````markdown
 ```{r, results = "asis", echo = FALSE}
 cat(knitr::knit_child(text = knitr::knit_code$get("exec-rscript"), options = list(message = FALSE), quiet = TRUE), sep = "\n")
 ```
 ````
-
-]
-
-]
+???
 
 For details about this new engine, see [`124-exec-engine.Rmd`](https://github.com/yihui/knitr-examples/blob/master/124-exec-engine.Rmd) in [knitr-examples repo](https://github.com/yihui/knitr-examples).
-
-???
 
 The `exec` engine allows to execute an arbitrary command on the code chunk
 content, optionally with arguments. If any, they are passed to `engine.opts` and
