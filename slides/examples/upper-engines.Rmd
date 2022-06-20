@@ -1,0 +1,17 @@
+```{r, include = FALSE}
+knitr::knit_engines$set(upper = function(options) {
+  code <- paste(options$code, collapse = "\n")
+  # Allow to hide result
+  if (options$results == 'hide') return()
+  # Allow to prevent processing
+  if (options$eval) {
+    toupper(code) 
+  } else {
+    code
+  }
+})
+```
+
+```{upper}
+Hello, **knitr** engines!
+```

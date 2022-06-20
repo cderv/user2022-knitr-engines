@@ -1,0 +1,15 @@
+```{r, include = FALSE}
+knitr::knit_engines$set(py = function(options) {
+  code <- paste(options$code, collapse = '\n')
+  out  <- system2(
+    'python', c('-c', shQuote(code)), stdout = TRUE
+  )
+  knitr::engine_output(options, code, out)
+})
+```
+
+
+```{py}
+import os
+print(os.environ.get('USERNAME'))
+```
