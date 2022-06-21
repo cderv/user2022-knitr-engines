@@ -1,7 +1,7 @@
 ---
 title: "A tour of {knitr} engines: {knitr} not only knits R"
 author: "Christophe Dervieux"
-date: userR!2022 - 22nd of July
+date: userR!2022 - 22nd of June
 output:
   xaringan::moon_reader:
     keep_md: true
