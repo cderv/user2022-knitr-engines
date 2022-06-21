@@ -1,4 +1,4 @@
-$color1: #0A7FB2 // blue
+$color1: #0B7EB0 // blue
 
 .color1
   color: $color1
@@ -8,6 +8,11 @@ $color1: #0A7FB2 // blue
 .fl
   pre
     margin: 0
+
+/* list */
+ul
+  li
+    margin-top: 1em
 
 /* rounded image */
 
@@ -29,7 +34,7 @@ $color1: #0A7FB2 // blue
 .remark-slide-content
   .subtitle
     display: block
-    color: #777
+    color: #757575
     font-size: 35px
     margin-bottom: 20px
     @extend %top-margin-m30
@@ -121,7 +126,12 @@ body
     text-align: center
     padding 0px
     margin: 0px
+  pre
+    margin: 0px
 
 .icon-link
-  font-size: 50%
-  vertical-align: top
+  display: inline-block
+  white-space: nowrap
+  a
+    font-size: 50%
+    vertical-align: top

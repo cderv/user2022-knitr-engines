@@ -1,38 +1,30 @@
 ---
-title: "A tour of **knitr** engines: **knitr** not only knits R"
+title: "A tour of {knitr} engines: {knitr} not only knits R"
 author: "Christophe Dervieux"
-date: userR!2022 - 22nd July
+date: userR!2022 - 22nd of July
 output:
   xaringan::moon_reader:
     keep_md: true
     lib_dir: libs
     chakra: libs/remark-latest.min.js
     css: [useR, useR-fonts, custom.sass]
+    self_containted: false
     nature:
       ratio: '16:9'
       # scale and scaleh
       beforeInit: "macros.js"
       highlightLines: true
-      # highlightStyle: solarized-light
+      highlightInlineCode: false
+      # highlightStyle: monokai
 ---
 
 ```{r xaringan-tachyons, echo=FALSE}
 xaringanExtra::use_tachyons()
 xaringanExtra::use_tile_view()
-xaringanExtra::use_panelset()
-xaringanExtra::use_freezeframe(responsive = FALSE)
 
-# will be used several times in a cat engine
-temp_file <- tempfile(fileext = ".Rmd")
-# setting option for the several cat engine
-knitr::opts_template$set(cat_md = list(
-  engine.opts = list(file = temp_file, lang = "markdown"),
-  echo = TRUE
-))
-# clean tempfile after a chunk computation
-knitr::knit_hooks$set(rm_temp = function(before) {
-  if (!before) unlink(temp_file)
-})
+icon_link <- function(word, url) {
+  knitr::knit_child(text = sprintf('.icon-link[%s [`r fontawesome::fa("external-link-alt")`](%s)]', word, url))
+}
 ```
 
 
@@ -41,13 +33,13 @@ knitr::knit_hooks$set(rm_temp = function(before) {
 
 .center.f3[.ba.b--blue.pa2.br4[`knitr::knit()`] + Pandoc (+ LaTeX for PDF) = `rmarkdown::render()`]
 
-.pull-left[
-.center[![:scale 80%, R Markdown wizard illustration by Alison Horst](rmarkdown_wizards.png)]
+.fl.w-50.pa2[
+.center[![:scale 100%, R Markdown wizard illustration by Alison Horst](rmarkdown_wizards.png)]
 .source-fig.center[Source: https://github.com/allisonhorst/stats-illustrations]
 ]
 
-.pull-right[
-.center[![:scale 120%, Diagram showing the different step of rendering, using knitr first from Rmd to md, then Pandoc from md to output format like HTML, DOC and PDF (using LaTeX)](https://bookdown.org/yihui/rmarkdown-cookbook/images/workflow.png)]
+.fl.w-50.pa2[
+.center[![:scale 80%, Diagram showing the different step of rendering, using knitr first from Rmd to md, then Pandoc from md to output format like HTML, DOC and PDF (using LaTeX)](https://bookdown.org/yihui/rmarkdown-cookbook/images/workflow.png)]
 .source-fig.center[
 source: [R Markdown Cookbook](https://bookdown.org/yihui/rmarkdown-cookbook)
 ]
@@ -121,7 +113,9 @@ layout: true
 
 ---
 
-.subtitle[Meet the `verbatim` and `embed` engine]
+.subtitle[Meet the `verbatim` engine]
+
+.center.f2[Include chunk content in a code block]
 
 ```{r, echo = FALSE}
 verbatim_content <- xfun::read_utf8("examples/verbatim-engine.Rmd")
@@ -130,20 +124,53 @@ verbatim_content <- gsub("(`{4}\\{)", "*\\1", verbatim_content)
 
 .fl.w-50.pa2[
 .ba[
-.title-file[Include raw content in code block]
+.title-file[.Rmd before knitting]
 `````{verbatim, lang = "markdown", code = verbatim_content}
 `````
 ]
 ]
 
+```{r, echo = FALSE}
+verbatim_content_knitted <- knitr::knit_child("examples/verbatim-engine.Rmd", quiet = TRUE) |> stringr::str_trim()
+verbatim_content_knitted <- gsub("\n\n\n","\n\n", verbatim_content_knitted)
+verbatim_content_knitted <- gsub("(`{4}markdown)", "*\\1", verbatim_content_knitted)
+```
+
+
 .fl.w-50.pa2[
 .ba[
-.title-file[Include file content in code block]
-`````{verbatim, lang = "markdown"}
-*```{embed, file = "macros.js"}
-```
+.title-file[.md after knitting]
+`````{verbatim, lang = "markdown", code = verbatim_content_knitted}
 `````
 ]
+]
+
+---
+
+.subtitle[Meet the `embed` engine]
+
+.center.f2[Include file content in a code block]
+
+```{r, echo = FALSE}
+embed_content <- xfun::read_utf8("examples/embed-engine.Rmd")
+```
+
+.ba[
+.title-file[.Rmd before knitting]
+`````{verbatim, lang = "markdown", code = gsub("(`{3}\\{)", "*\\1", embed_content)}
+`````
+]
+
+```{r, echo = FALSE}
+embed_content_knitted <- knitr::knit_child(text = embed_content, quiet = TRUE) |> stringr::str_trim()
+embed_content_knitted <- gsub("\n\n\n","\n\n", embed_content_knitted)
+embed_content_knitted <- gsub("(`{3}js)", "*\\1", embed_content_knitted)
+```
+
+.ba.mt2[
+.title-file[.md after knitting]
+```{verbatim, code = embed_content_knitted}
+```
 ]
 
 ---
@@ -186,6 +213,33 @@ asis_content <- gsub("\\n(```\\{asis)", "*\\1", asis_content)
 ???
 
 https://bookdown.org/yihui/rmarkdown-cookbook/eng-asis.html
+
+---
+layout: false
+# Adding dependencies
+
+.subtitle[Include CSS and JS easily in HTML]
+
+.fl.w-50.pa2[
+````{verbatim, lang = "markdown"}
+```{css, echo=FALSE}
+/* Some CSS code that will will be included in HTML document a `<style>` tag. */
+```
+````
+]
+
+.fl.w-50.pa2[
+````{verbatim, lang = "markdown"}
+```{js, echo=FALSE}
+// some JS code that will be included in HTML document in a`<script>` tag.
+```
+````
+]
+
+.fl.w-100.pa2[
+Useful to customize output directly from the Rmd file without external resource
+]
+
 
 ---
 layout: true
@@ -270,40 +324,14 @@ In your Rmd file
 
 ---
 layout: false
-# Adding dependencies
-
-.subtitle[Include CSS and JS easily in HTML]
-
-.fl.w-50.pa2[
-````{verbatim, lang = "markdown"}
-```{css, echo=FALSE}
-/* Some CSS code that will will be included in HTML document a `<style>` tag. */
-```
-````
-]
-
-.fl.w-50.pa2[
-````{verbatim, lang = "markdown"}
-```{js, echo=FALSE}
-// some JS code that will be included in HTML document in a`<script>` tag.
-```
-````
-]
-
-.fl.w-100.pa2[
-Useful to customize output directly from the Rmd file without external resource
-]
-
-
----
 # Working with interoperability
 
-.subtitle[More engine powered by other `r emo::ji("package")`]
+.subtitle[More engines powered by other `r emo::ji("package")`]
 
-* Use the `sql` engine to run queries using **DBI** on compatible databases,
-* Use the `python` engine with **reticulate** to work seemlessly with R and Python chunks together,
-* Use the `scss` or `sass` engine to process a chunk content with **sass** package to insert a CSS in HTML
-* Use the `bslib` engine to add rules to **bslib** themes withing Rmd 
+* Use the .color1[`sql`]  engine to run queries using **DBI** on compatible `r icon_link("databases", "https://bookdown.org/yihui/rmarkdown/language-engines.html#sql")`
+* Use the .color1[`python`]  engine with **reticulate** to work seemlessly with R and Python chunks `r icon_link("together", "https://rstudio.github.io/reticulate/articles/r_markdown.html")`
+* Use the .color1[`scss`]  or .color1[`sass`]  engine to process a chunk content with **sass** package to insert a CSS in `r icon_link("HTML", "https://rstudio.github.io/sass/articles/sass.html#rmarkdown")`
+* Use the .color1[`bslib`]  engine to add rules to **bslib** themes withing `r icon_link("Rmd", "https://rstudio.github.io/bslib/articles/bslib.html#advanced")` 
 
 ???
 
@@ -312,14 +340,14 @@ Some R packages are great to work with other tools like **DBI** for SQL queries,
 ---
 layout: false
 
-# Extending knitr with custom engines
+# Extending {knitr} with custom engines
 
 .subtitle[Any package can provide custom way to process chunk content]
  
-* **glue** has a `glue` engine to process chunk content as if passed to `glue::glue()` .icon-link[[`r fontawesome::fa("external-link")`](https://glue.tidyverse.org/articles/engines.html)]
-* **texPreview** has a `texPreview` engine to render TeX snippet from code chunk, in non-LaTeX output document .icon-link[[`r fontawesome::fa("external-link")`](https://yonicd.github.io/texPreview/articles/engine.html)]
-* **target** offers a `targets` engine so that Literate programming can be used to create a **targets** workflow (Target Markdown) .icon-link[[`r fontawesome::fa("external-link")`](https://books.ropensci.org/targets/markdown.html)]
-* **d3** has a `d3` engine where chunk content will be processed with **r2d3** .icon-link[[`r fontawesome::fa("external-link")`](https://bookdown.org/yihui/rmarkdown-cookbook/d3.html#d3)]
+* **glue** has a .color1[`glue`]  engine to process chunk content as if passed to `glue::glue()` `r icon_link("function", "https://glue.tidyverse.org/articles/engines.html")`
+* **texPreview** has a .color1[`texpreview`] engine to render TeX snippet from code chunk, in non-LaTeX output `r icon_link("document", "https://yonicd.github.io/texPreview/articles/engine.html")`
+* **targets** offers a .color1[`targets`] engine so that literate programming can be used to create a **targets** workflow `r icon_link("(Target Markdown)", "https://books.ropensci.org/targets/markdown.html#target-markdown")`
+* **d3** has a .color1[`d3`] engine where chunk content will be processed with `r icon_link("**r2d3**", "https://bookdown.org/yihui/rmarkdown-cookbook/d3.html#d3")`
 
 ???
 
@@ -330,9 +358,9 @@ https://books.ropensci.org/targets/markdown.html
 ---
 layout: true
 
-# Extending knitr with custom engines
+# Extending {knitr} with custom engines
 
-.subtitle[Registering custom engine]
+.subtitle[How to create a new engine ?]
 
 ---
 
@@ -343,7 +371,7 @@ knitr::knit_engines$set(foo = function(options) {
 })
 ```
 
-* Use `knit_engines` to register by name
+* Use `knit_engines$set()` to register by name
 * All knitr options are passed to the engine
 * Code chunk content is in `options$code`
 
@@ -353,7 +381,9 @@ knitr::knit_engines$set(foo = function(options) {
 This engine will take the chunk content and make it upper case.
 ]
 
-.fl.w-50.pa2[
+.fl.w-60.pa2[
+
+.v-mid[
 
 ```r
 knitr::knit_engines$set(upper = function(options) {
@@ -369,14 +399,15 @@ knitr::knit_engines$set(upper = function(options) {
 })
 ```
 ]
+]
 
-.fl.w-50.pa2[
+.fl.w-40.pa2[
 
 
 ```{verbatim, lang = "markdown", code = xfun::read_utf8("examples/upper-engines.Rmd")[15:17]}
 ```
 
-would output
+.small.center[`r fontawesome::fa('arrow-down')`]
 
 ```{verbatim, lang = "markdown", code = stringr::str_trim(knitr::knit_child("examples/upper-engines.Rmd", quiet = TRUE))}
 ```
@@ -386,7 +417,7 @@ would output
 
 .fl.w-100.pa2[A custom `py` engine to run `python`]
 
-.fl.w-50.pa2[
+.fl.w-60.pa2[
 
 ```r
 knitr::knit_engines$set(py = function(options) {
@@ -397,10 +428,9 @@ knitr::knit_engines$set(py = function(options) {
   knitr::engine_output(options, code, out)
 })
 ```
-
 ]
 
-.fl.w-50.pa2[
+.fl.w-40.pa2[
 
 
 ```{verbatim, lang = "markdown", code = xfun::read_utf8("examples/py-engine.Rmd")[12:15]}
@@ -443,22 +473,6 @@ count: false
 ]
 ]
 
-
----
-class: annexe
-count: false
-
-# Acknowledgement
-
-```{r, include = FALSE}
-gh_handle_to_link <- function(handle) sprintf("[@%s](https://github.com/%s)", handle, handle)
-```
-
-
-* Emily Riederer and Yihui Xie, for the R Markdown Cookbook
-* Allison Horst for the illustrations.
-* Alison Presman-Hill and Allison Horst for the **palmerpinguins** `r emo::ji("package")` and vignettes.
-* `r gh_handle_to_link("cpsievert")` for the [**sass**](https://rstudio.github.io/sass/) `r emo::ji("package")`
 
 ```{r meta, echo=FALSE}
 library(metathis)
