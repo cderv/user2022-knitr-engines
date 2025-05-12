@@ -18,7 +18,9 @@ output:
       # highlightStyle: monokai
 ---
 
-```{r xaringan-tachyons, echo=FALSE}
+```{r}
+#| label: xaringan-tachyons
+#| echo: false
 xaringanExtra::use_tachyons()
 xaringanExtra::use_tile_view()
 
@@ -61,15 +63,19 @@ result with other text in the knitting process.
 .subtitle[Using R as example]
 
 .fl.w-50.pa2[
-````{verbatim, lang = "markdown"}
-```{r setup, include = FALSE}
+````{verbatim}
+#| lang: markdown
+```{r}
+#| label: setup
+#| include: false
 knitr::opts_chunk$set(echo = FALSE)
 ```
 ````
 ]
 
 .fl.w-50.pa2[
-````{verbatim, lang = "markdown"}
+````{verbatim}
+#| lang: markdown
 ```{<engine> <label>, <keys = values>}
 <code content>
 ```
@@ -94,7 +100,8 @@ Usually, R engine is used with **knitr** chunks to evaluate R code and showing s
 
 A subset of available engines
 
-```{r, R.options = list(width = 80)}
+```{r}
+#| R.options: !expr list(width = 80)
 names(knitr::knit_engines$get())
 ```
 
@@ -117,7 +124,8 @@ layout: true
 
 .center.f2[Include chunk content in a code block]
 
-```{r, echo = FALSE}
+```{r}
+#| echo: false
 verbatim_content <- xfun::read_utf8("examples/verbatim-engine.Rmd")
 verbatim_content <- gsub("(`{4}\\{)", "*\\1", verbatim_content)
 ```
@@ -125,12 +133,15 @@ verbatim_content <- gsub("(`{4}\\{)", "*\\1", verbatim_content)
 .fl.w-50.pa2[
 .ba[
 .title-file[.Rmd before knitting]
-`````{verbatim, lang = "markdown", code = verbatim_content}
+`````{verbatim}
+#| lang: markdown
+#| code: !expr verbatim_content
 `````
 ]
 ]
 
-```{r, echo = FALSE}
+```{r}
+#| echo: false
 verbatim_content_knitted <- knitr::knit_child("examples/verbatim-engine.Rmd", quiet = TRUE) |> stringr::str_trim()
 verbatim_content_knitted <- gsub("\n\n\n","\n\n", verbatim_content_knitted)
 verbatim_content_knitted <- gsub("(`{4}markdown)", "*\\1", verbatim_content_knitted)
@@ -140,7 +151,9 @@ verbatim_content_knitted <- gsub("(`{4}markdown)", "*\\1", verbatim_content_knit
 .fl.w-50.pa2[
 .ba[
 .title-file[.md after knitting]
-`````{verbatim, lang = "markdown", code = verbatim_content_knitted}
+`````{verbatim}
+#| lang: markdown
+#| code: !expr verbatim_content_knitted
 `````
 ]
 ]
@@ -151,17 +164,21 @@ verbatim_content_knitted <- gsub("(`{4}markdown)", "*\\1", verbatim_content_knit
 
 .center.f2[Include file content in a code block]
 
-```{r, echo = FALSE}
+```{r}
+#| echo: false
 embed_content <- xfun::read_utf8("examples/embed-engine.Rmd")
 ```
 
 .ba[
 .title-file[.Rmd before knitting]
-`````{verbatim, lang = "markdown", code = gsub("(`{3}\\{)", "*\\1", embed_content)}
+`````{verbatim}
+#| lang: markdown
+#| code: !expr gsub("(`{3}\\{)", "*\\1", embed_content)
 `````
 ]
 
-```{r, echo = FALSE}
+```{r}
+#| echo: false
 embed_content_knitted <- knitr::knit_child(text = embed_content, quiet = TRUE) |> stringr::str_trim()
 embed_content_knitted <- gsub("\n\n\n","\n\n", embed_content_knitted)
 embed_content_knitted <- gsub("(`{3}js)", "*\\1", embed_content_knitted)
@@ -169,7 +186,8 @@ embed_content_knitted <- gsub("(`{3}js)", "*\\1", embed_content_knitted)
 
 .ba.mt2[
 .title-file[.md after knitting]
-```{verbatim, code = embed_content_knitted}
+```{verbatim}
+#| code: !expr embed_content_knitted
 ```
 ]
 
@@ -177,14 +195,16 @@ embed_content_knitted <- gsub("(`{3}js)", "*\\1", embed_content_knitted)
 
 .subtitle[Look at the `asis` engine]
 
-```{r, echo = FALSE}
+```{r}
+#| echo: false
 asis_content <- knitr::knit_expand("examples/asis-engine.Rmd", value = "getRandomNumber() == 4")
 asis_content <- gsub("\\n(```\\{asis)", "*\\1", asis_content)
 ```
 
 
 .fl.w-60.pa2[
-```{verbatim, code = asis_content}
+```{verbatim}
+#| code: !expr asis_content
 ```
 ]
 
@@ -199,14 +219,18 @@ asis_content <- gsub("\\n(```\\{asis)", "*\\1", asis_content)
 .fl.w-50.pa2[
 .f3[For `getRandomNumber() != 4`]
 
-```{verbatim, code = knitr::knit_child(text = knitr::knit_expand("examples/asis-engine.Rmd", value = "FALSE"))}
+```{verbatim}
+#| code: !expr knitr::knit_child(text = knitr::knit_expand("examples/asis-engine.Rmd",
+#|   value = "FALSE"))
 ```
 ]
 
 .fl.w-50.pa2[
 .f3[For `getRandomNumber() == 4`]
 
-```{verbatim, code = knitr::knit_child(text = knitr::knit_expand("examples/asis-engine.Rmd", value = "TRUE"))}
+```{verbatim}
+#| code: !expr knitr::knit_child(text = knitr::knit_expand("examples/asis-engine.Rmd",
+#|   value = "TRUE"))
 ```
 ]
 
@@ -221,16 +245,20 @@ layout: false
 .subtitle[Include CSS and JS easily in HTML]
 
 .fl.w-50.pa2[
-````{verbatim, lang = "markdown"}
-```{css, echo=FALSE}
+````{verbatim}
+#| lang: markdown
+```{css}
+/*| echo: false*/
 /* Some CSS code that will will be included in HTML document a `<style>` tag. */
 ```
 ````
 ]
 
 .fl.w-50.pa2[
-````{verbatim, lang = "markdown"}
-```{js, echo=FALSE}
+````{verbatim}
+#| lang: markdown
+```{js}
+//| echo: false
 // some JS code that will be included in HTML document in a`<script>` tag.
 ```
 ````
@@ -251,7 +279,8 @@ layout: true
 .subtitle[Some built-in support]
 
 .fl.w-50.pa2[
-````{verbatim, lang = "markdown"}
+````{verbatim}
+#| lang: markdown
 ```{python}
 import os
 os.env
@@ -260,7 +289,8 @@ os.env
 ]
 
 .fl.w-50.pa2[
-````{verbatim, lang = "markdown"}
+````{verbatim}
+#| lang: markdown
 ```{stata}
 sysuse auto
 summarize
@@ -269,7 +299,8 @@ summarize
 ]
 
 .fl.w-50.pa2[
-````{verbatim, lang = "markdown"}
+````{verbatim}
+#| lang: markdown
 ```{bash}
 ls *.Rmd | head -n 5
 ```
@@ -277,7 +308,8 @@ ls *.Rmd | head -n 5
 ]
 
 .fl.w-50.pa2[
-````{verbatim, lang = "markdown"}
+````{verbatim}
+#| lang: markdown
 ```{perl}
 $test = "jello world";
 $test =~ s/j/h/;
@@ -296,14 +328,20 @@ Chunk content is passed to the tools through `system2()`
 
 Using `node` CLI (which require `.js` extension for scripts)
 
-````{verbatim exec-rscript,  lang = "markdown"}
-```{exec, command='node', engine.opts = list(ext = ".js")}
+````{verbatim}
+#| label: exec-rscript
+#| lang: markdown
+```{exec}
+#| command: node
+#| engine.opts: !expr list(ext = ".js")
 function Display(x) { console.log(`Your number is ${x}`); }
 Display(100);
 ```
 ````
 ````markdown
-```{r, results = "asis", echo = FALSE}
+```{r}
+#| results: asis
+#| echo: false
 cat(stringr::str_trim(knitr::knit_child(text = knitr::knit_code$get("exec-rscript"), options = list(message = FALSE), quiet = TRUE)), sep = "\n")
 ```
 ````
@@ -404,12 +442,17 @@ knitr::knit_engines$set(upper = function(options) {
 .fl.w-40.pa2[
 
 
-```{verbatim, lang = "markdown", code = xfun::read_utf8("examples/upper-engines.Rmd")[15:17]}
+```{verbatim}
+#| lang: markdown
+#| code: !expr xfun::read_utf8("examples/upper-engines.Rmd")[15:17]
 ```
 
 .small.center[`r fontawesome::fa('arrow-down')`]
 
-```{verbatim, lang = "markdown", code = stringr::str_trim(knitr::knit_child("examples/upper-engines.Rmd", quiet = TRUE))}
+```{verbatim}
+#| lang: markdown
+#| code: !expr stringr::str_trim(knitr::knit_child("examples/upper-engines.Rmd", quiet
+#|   = TRUE))
 ```
 ]
 
@@ -433,12 +476,17 @@ knitr::knit_engines$set(py = function(options) {
 .fl.w-40.pa2[
 
 
-```{verbatim, lang = "markdown", code = xfun::read_utf8("examples/py-engine.Rmd")[12:15]}
+```{verbatim}
+#| lang: markdown
+#| code: !expr xfun::read_utf8("examples/py-engine.Rmd")[12:15]
 ```
 
 .small.center[`r fontawesome::fa('arrow-down')`]
 
-```{verbatim, lang = "markdown", code = stringr::str_trim(knitr::knit_child("examples/py-engine.Rmd", quiet = TRUE))}
+```{verbatim}
+#| lang: markdown
+#| code: !expr stringr::str_trim(knitr::knit_child("examples/py-engine.Rmd", quiet =
+#|   TRUE))
 ```
 ]
 
@@ -474,7 +522,9 @@ count: false
 ]
 
 
-```{r meta, echo=FALSE}
+```{r}
+#| label: meta
+#| echo: false
 library(metathis)
 meta() %>%
   meta_general(
